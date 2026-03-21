@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Materials Project 数据查询</title>
+
+  <!-- UI 框架 + 图标库 + 动画库 -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #4CAF50;
+      --primary-dark: #388E3C;
+      --secondary: #2196F3;
+      --light-bg: #f5f7fa;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --text-light: #666666;
+      --success: #4CAF50;
+      --warning: #FFC107;
+      --error: #F44336;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--light-bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+    }
+
+    .container {
+      max-width: 800px;
+      padding: 40px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      background: var(--card-bg);
+      position: relative;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    #particles-js {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      opacity: 0.15;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo i {
+      font-size: 40px;
+      color: white;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: var(--primary-dark);
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-light);
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+
+    .info-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #e8f5e9;
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .info-box i {
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #fafafa;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+      background: white;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 5px; height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+
+    .btn-primary:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(50, 50);
+        opacity: 0;
+      }
+    }
+
+    .examples {
+      background: #f1f8e9;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 25px;
+      border-left: 4px solid var(--warning);
+    }
+
+    .examples h3 {
+      margin-top: 0;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+
+    .examples ul {
+      padding-left: 20px;
+      margin-bottom: 0;
+    }
+
+    .examples li {
+      margin-bottom: 8px;
+      color: var(--text-light);
+    }
+
+    .examples li:last-child {
+      margin-bottom: 0;
+    }
+
+    .result-container {
+      display: none;
+      margin-top: 30px;
+      padding: 20px;
+      background: #e8f5e9;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .result-container.show {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary);
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      background: #ffebee;
+      color: var(--error);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+      border-left: 4px solid var(--error);
+    }
+
+    .error-message.show {
+      display: block;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    .contact-info {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .contact-info a {
+      color: var(--secondary);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .contact-info a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 粒子背景 -->
+    <div id="particles-js"></div>
+
+    <!-- Logo 和标题 -->
+    <div class="logo-container">
+      <div class="logo">
+        <i class="fas fa-atom"></i>
+      </div>
+      <h1>Materials Project 查询工具</h1>
+      <p class="subtitle">探索材料科学数据库，发现新材料的无限可能</p>
+    </div>
+
+    <!-- 信息提示框 -->
+    <div class="info-box">
+      <i class="fas fa-info-circle"></i>
+      <div>
+        <p>输入化学元素符号查询相关化合物数据，支持单元素或多元素查询（如 Fe 或 Li-Fe-O）</p>
+      </div>
+    </div>
+
+    <!-- 错误消息 -->
+    <div id="errorMessage" class="error-message">
+      <i class="fas fa-exclamation-circle mr-2"></i>
+      <span id="errorText"></span>
+    </div>
+
+    <!-- 查询表单 -->
+    <form id="queryForm" method="POST">
+      <div class="form-group">
+        <label for="element"><i class="fas fa-flask mr-2"></i>元素符号</label>
+        <input
+          type="text"
+          id="element"
+          name="element"
+          required
+          class="input-field"
+          placeholder="例如: Fe, Ti, 或 Li-Fe-O"
+          value=""
+        >
+        <p class="text-xs text-gray-500 mt-1">支持单元素（如 Fe）或多元素组合（如 Li-Fe-O）</p>
+      </div>
+
+      <div class="form-group">
+        <label for="max_records"><i class="fas fa-list-ol mr-2"></i>记录数量 (1-500)</label>
+        <input
+          type="number"
+          id="max_records"
+          name="max_records"
+          min="1"
+          max="500"
+          class="input-field"
+          placeholder="例如: 100"
+          value=""
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-search mr-2"></i>查询材料数据
+      </button>
+    </form>
+
+    <!-- 结果容器 -->
+    <div id="resultContainer" class="result-container">
+      <div class="spinner"></div>
+      <p>正在查询 Materials Project 数据库，请稍候...</p>
+    </div>
+
+    <!-- 示例部分 -->
+    <div class="examples">
+      <h3><i class="fas fa-lightbulb mr-2"></i>查询示例</h3>
+      <ul>
+        <li><strong>铁基化合物</strong>: 输入 "Fe" 查询所有含铁的化合物</li>
+        <li><strong>锂电池材料</strong>: 输入 "Li-Mn-O" 查询锂锰氧化物</li>
+        <li><strong>钙钛矿结构</strong>: 输入 "Ca-Ti-O" 查询钙钛矿材料</li>
+        <li><strong>半导体材料</strong>: 输入 "Ga-As" 查询砷化镓</li>
+      </ul>
+    </div>
+
+    <!-- 页脚 -->
+    <div class="footer">
+      <p>© 2026 Materials Project 数据查询工具 | 基于 Materials Project API</p>
+      <div class="contact-info">
+        <a href="mailto:2562662483@qq.com"><i class="fas fa-envelope mr-1"></i>联系开发者</a>
+        <a href="https://materialsproject.org/" target="_blank"><i class="fas fa-external-link-alt mr-1"></i>访问官网</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 初始化粒子背景
+    document.addEventListener('DOMContentLoaded', function() {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 60, density: { enable: true, value_area: 800 } },
+          color: { value: "#4CAF50" },
+          shape: { type: "circle" },
+          opacity: { value: 0.5, random: true },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#4CAF50",
+            opacity: 0.3,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 1,
+            direction: "none",
+            random: true,
+            straight: false,
+            out_mode: "out",
+            bounce: false
+          }
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: { enable: true, mode: "grab" },
+            onclick: { enable: true, mode: "push" },
+            resize: true
+          },
+          modes: {
+            grab: { distance: 140, line_linked: { opacity: 1 } },
+            push: { particles_nb: 4 }
+          }
+        },
+        retina_detect: true
+      });
+
+      // 表单提交处理
+      const form = document.getElementById('queryForm');
+      const resultContainer = document.getElementById('resultContainer');
+      const errorMessage = document.getElementById('errorMessage');
+      const errorText = document.getElementById('errorText');
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // 获取表单数据
+        const element = document.getElementById('element').value.trim();
+        const maxRecords = document.getElementById('max_records').value;
+
+        // 简单验证
+        if (!element) {
+          showError('请输入元素符号');
+          return;
+        }
+
+        if (maxRecords < 1 || maxRecords > 500) {
+          showError('记录数量必须在1-500之间');
+          return;
+        }
+
+        // 显示加载状态
+        resultContainer.classList.add('show');
+        errorMessage.classList.remove('show');
+
+        try {
+          // 发送AJAX请求
+          const response = await fetch('/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              element: element,
+              max_records: maxRecords
+            })
+          });
+
+          // 处理重定向
+          if (response.redirected) {
+            window.location.href = response.url;
+            return;
+          }
+
+          // 解析响应
+          if (!response.ok) {
+            throw new Error(`HTTP错误！状态码：${response.status}`);
+          }
+
+          // 显示结果
+          const data = await response.json();
+          displayResults(data);
+        } catch (error)
